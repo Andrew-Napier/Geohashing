@@ -14,6 +14,7 @@
 		49D12EBE2265E4D90013F263 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 49D12EBD2265E4D90013F263 /* Assets.xcassets */; };
 		49D12EC12265E4D90013F263 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 49D12EBF2265E4D90013F263 /* LaunchScreen.storyboard */; };
 		49D12ECC2265E4D90013F263 /* GeohashingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49D12ECB2265E4D90013F263 /* GeohashingTests.swift */; };
+		49D7245B226C564700F53952 /* StockMarketDataFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49D7245A226C564700F53952 /* StockMarketDataFetcher.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -39,6 +40,7 @@
 		49D12EC72265E4D90013F263 /* GeohashingTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = GeohashingTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		49D12ECB2265E4D90013F263 /* GeohashingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeohashingTests.swift; sourceTree = "<group>"; };
 		49D12ECD2265E4D90013F263 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		49D7245A226C564700F53952 /* StockMarketDataFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StockMarketDataFetcher.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -97,6 +99,7 @@
 				49D12EBF2265E4D90013F263 /* LaunchScreen.storyboard */,
 				49D12EC22265E4D90013F263 /* Info.plist */,
 				49912852226B151B00D3B6EB /* Geohashing-Bridging-Header.h */,
+				49D7245A226C564700F53952 /* StockMarketDataFetcher.swift */,
 			);
 			path = Geohashing;
 			sourceTree = "<group>";
@@ -212,6 +215,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				49D7245B226C564700F53952 /* StockMarketDataFetcher.swift in Sources */,
 				49D12EB92265E4D80013F263 /* ViewController.swift in Sources */,
 				49D12EB72265E4D80013F263 /* AppDelegate.swift in Sources */,
 			);
