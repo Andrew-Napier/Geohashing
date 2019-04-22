@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		496F633E2269D1510056EB1A /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 496F633D2269D1510056EB1A /* CoreLocation.framework */; };
+		49BA1BB3226DB9E700FFCD85 /* LocationFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49BA1BB2226DB9E700FFCD85 /* LocationFetcher.swift */; };
 		49D12EB72265E4D80013F263 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49D12EB62265E4D80013F263 /* AppDelegate.swift */; };
 		49D12EB92265E4D80013F263 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49D12EB82265E4D80013F263 /* ViewController.swift */; };
 		49D12EBC2265E4D80013F263 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 49D12EBA2265E4D80013F263 /* Main.storyboard */; };
@@ -30,6 +31,7 @@
 /* Begin PBXFileReference section */
 		496F633D2269D1510056EB1A /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
 		49912852226B151B00D3B6EB /* Geohashing-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Geohashing-Bridging-Header.h"; sourceTree = "<group>"; };
+		49BA1BB2226DB9E700FFCD85 /* LocationFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationFetcher.swift; sourceTree = "<group>"; };
 		49D12EB32265E4D80013F263 /* Geohashing.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Geohashing.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		49D12EB62265E4D80013F263 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		49D12EB82265E4D80013F263 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -100,6 +102,7 @@
 				49D12EC22265E4D90013F263 /* Info.plist */,
 				49912852226B151B00D3B6EB /* Geohashing-Bridging-Header.h */,
 				49D7245A226C564700F53952 /* StockMarketDataFetcher.swift */,
+				49BA1BB2226DB9E700FFCD85 /* LocationFetcher.swift */,
 			);
 			path = Geohashing;
 			sourceTree = "<group>";
@@ -217,6 +220,7 @@
 			files = (
 				49D7245B226C564700F53952 /* StockMarketDataFetcher.swift in Sources */,
 				49D12EB92265E4D80013F263 /* ViewController.swift in Sources */,
+				49BA1BB3226DB9E700FFCD85 /* LocationFetcher.swift in Sources */,
 				49D12EB72265E4D80013F263 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

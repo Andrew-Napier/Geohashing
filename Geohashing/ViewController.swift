@@ -5,49 +5,32 @@
 //  Created by Andrew Napier on 16/4/19.
 //  Copyright © 2019 Andrew Napier. All rights reserved.
 //
-import CoreLocation
 import MapKit
 import Foundation
 import UIKit
 
 class ViewController: UIViewController,
-        CLLocationManagerDelegate,
-        MKMapViewDelegate {
-    let locationManager = CLLocationManager()
+        MKMapViewDelegate,
+        LocationFetcherDelegate {
     
     var datePrefix : String = ""
+    var location : CLLocationCoordinate2D?
+    var stockIndicator : String?
     var dataFetcher = StockMarketDataFetcher(year: 2019, month: 04, day: 21)
+    var locationFetcher : LocationFetcher?
     private var offset : CLLocationCoordinate2D?
+    private var here : CLLocationCoordinate2D = CLLocationCoordinate2D(latitude: 0.0, longitude: 0.0)
+    
     
     @IBOutlet weak var mapView: MKMapView!
     
     
-    fileprivate func doLocationStuff() {
-        // Do any additional setup after loading the view, typically from a nib.
-        
-        locationManager.delegate = self
-        
-        switch CLLocationManager.authorizationStatus() {
-        case .notDetermined:
-            // Request when-in-use authorization initially
-            locationManager.requestWhenInUseAuthorization()
-            break
-            
-        case .restricted, .denied:
-            // Disable location features
-            disableMyLocationBasedFeatures()
-            break
-            
-        case .authorizedWhenInUse, .authorizedAlways:
-            // Enable location features
-            enableMyWhenInUseFeatures()
-            break
-        }
-    }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        doLocationStuff()
+        locationFetcher = LocationFetcher(self)
+        locationFetcher?.addObserver(self, forKeyPath: "current", context: nil)
+        locationFetcher?.doLocationStuff()
     }
     
     
@@ -68,29 +51,52 @@ class ViewController: UIViewController,
         dataFetcher.doFetch()
         self.datePrefix =
             String(format:"%.4d-%.2d-%.2d",y,m,d)
-        getCurrentLocation()
     }
     
-    func getCurrentLocation() {
-        locationManager.desiredAccuracy = kCLLocationAccuracyKilometer
-        locationManager.distanceFilter = 1000.0  // In meters.
-        locationManager.delegate = self
-        locationManager.startUpdatingLocation()
-
-    }
     
     override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
         if keyPath == "stockIndicator" {
             guard let stockIndicator = (object as? StockMarketDataFetcher)?.stockIndicator else {
                 return
             }
+            self.stockIndicator = stockIndicator
+            convertSeedToLatLonOffset()
+            addLocationAnnotations()
+        }
+        
+        if keyPath == "current" {
+            guard let currentPos = (object as? LocationFetcher)?.current else {
+                return
+            }
+            self.location = currentPos
+            setMapRegion()
+        }
+        
+        if self.location != nil && self.stockIndicator != nil {
             
-            convertSeedToLatLonOffset(stockIndicator)
+        }
+    }
+    
+    func addLocationAnnotations() {
+        for lon in 148...156 { //-179...179 {
+            for lat in -30 ... -24 { //-89...89 {
+                let corner = CLLocationCoordinate2D(latitude: Double(lon), longitude: Double(lat))
+                let pos = MKPlacemark(coordinate: merge(currentLocation: corner, withOffset: self.offset))
+                
+                mapView.addAnnotation(pos)
+            }
+        }
+        DispatchQueue.main.async {
+            self.mapView.setNeedsDisplay()
         }
     }
 
-    fileprivate func convertSeedToLatLonOffset(_ stockIndicator : String) {
-        let seed = "\(self.datePrefix)-\(stockIndicator)"
+
+    fileprivate func convertSeedToLatLonOffset() {
+        guard let si = self.stockIndicator else {
+            return
+        }
+        let seed = "\(self.datePrefix)-\(si)"
         print(seed)
         var latitudeHexOffset = seed.md5
         latitudeHexOffset.removeLast(16)
@@ -116,29 +122,38 @@ class ViewController: UIViewController,
         print("calculated offset: \(String(describing:offset))")
     }
     
-    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        print("Number of locations: \(locations.count)")
-        let l = locations[0]
+    func setMapRegion() {
+        guard let l = self.location else {
+            return
+        }
+        let midPoint = merge(currentLocation: l, withOffset: CLLocationCoordinate2D(latitude: 0.5, longitude: 0.5) )
         
-        let cachePoint = merge(currentLocation: l, withOffset: self.offset)
-        print(cachePoint)
         mapView.region =
         MKCoordinateRegion(
-            center: cachePoint,
-            latitudinalMeters: 200.0,
-            longitudinalMeters: 200.0)
-//        MKCoordinateRegion(center: <#T##CLLocationCoordinate2D#>, span: <#T##MKCoordinateSpan#>)
+            center: midPoint,
+            span: MKCoordinateSpan(latitudeDelta: 1.0, longitudeDelta: 1.0))
     }
     
-    func merge(currentLocation location : CLLocation,
+    func merge(currentLocation location : CLLocationCoordinate2D,
                withOffset offset : CLLocationCoordinate2D?) -> CLLocationCoordinate2D {
-        guard let ofs = offset else  {
-            return CLLocationCoordinate2D(latitude: location.coordinate.latitude,
-                                          longitude: location.coordinate.longitude)
+        guard var ofs = offset else  {
+            return location
         }
-        return CLLocationCoordinate2D(
-            latitude: trunc(location.coordinate.latitude) + ofs.latitude,
-            longitude: trunc(location.coordinate.longitude) + ofs.longitude)
+        if location.latitude < 0 {
+            ofs.latitude *= -1.0
+        }
+        if location.longitude < 0 {
+            ofs.longitude *= -1.0
+        }
+        let merged = CLLocationCoordinate2D(
+            latitude: trunc(location.latitude) + ofs.latitude,
+            longitude: trunc(location.longitude) + ofs.longitude)
+        
+        return merged
+    }
+    
+    func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
+        return nil
     }
 }
 
