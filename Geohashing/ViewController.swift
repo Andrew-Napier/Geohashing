@@ -36,6 +36,14 @@ class ViewController: UIViewController,
     
     override func viewDidLoad() {
         super.viewDidLoad()
+//        mapView.register(MKMarkerAnnotationView.self,
+//                         forAnnotationViewWithReuseIdentifier: "pin")
+//        let hashLocation = CLLocationCoordinate2D(latitude: Double(lon), longitude: Double(lat))
+//        let hashLocation = self.merge(currentLocation: corner, withOffset: self.offset)
+//        let pos = GeohashMarker("geohash", location: hashLocation)
+//
+//        self.mapView.addAnnotation(pos )
+
     }
 
     func disableMyLocationBasedFeatures() {
@@ -43,9 +51,13 @@ class ViewController: UIViewController,
     }
  
     func enableMyWhenInUseFeatures() {
-        let y = 2005
-        let m = 5
-        let d = 26
+        let dateToHash = Date()
+        let components = Calendar.current.dateComponents([.day, .month, .year], from: dateToHash)
+        
+        let y = components.year ?? 0
+        let m = components.month ?? 0
+        var d = components.day ?? 0
+        d -= 1
         dataFetcher = StockMarketDataFetcher(year: y, month: m, day: d)
         dataFetcher.addObserver(self, forKeyPath: "stockIndicator", context: nil)
         dataFetcher.doFetch()
@@ -71,22 +83,20 @@ class ViewController: UIViewController,
             self.location = currentPos
             setMapRegion()
         }
-        
-        if self.location != nil && self.stockIndicator != nil {
-            
-        }
     }
     
     func addLocationAnnotations() {
-        for lon in 148...156 { //-179...179 {
-            for lat in -30 ... -24 { //-89...89 {
-                let corner = CLLocationCoordinate2D(latitude: Double(lon), longitude: Double(lat))
-                let pos = MKPlacemark(coordinate: merge(currentLocation: corner, withOffset: self.offset))
-                
-                mapView.addAnnotation(pos)
-            }
-        }
         DispatchQueue.main.async {
+            for lon in 148...156 { //-179...179 {
+                for lat in -30 ... -24 { //-89...89 {
+                    let corner = CLLocationCoordinate2D(latitude: Double(lat), longitude: Double(lon))
+                    let hashLocation = self.merge(currentLocation: corner, withOffset: self.offset)
+                    let pos = GeohashMarker(self.stockIndicator ?? "geohash",
+                                            location: hashLocation)
+                    
+                    self.mapView.addAnnotation(pos )
+                }
+            }
             self.mapView.setNeedsDisplay()
         }
     }
@@ -97,7 +107,6 @@ class ViewController: UIViewController,
             return
         }
         let seed = "\(self.datePrefix)-\(si)"
-        print(seed)
         var latitudeHexOffset = seed.md5
         latitudeHexOffset.removeLast(16)
         var longitudeHexOffset = seed.md5
@@ -119,7 +128,6 @@ class ViewController: UIViewController,
         }
         self.offset = CLLocationCoordinate2D(latitude: latitudeOffset,
                                              longitude: longitudeDecOffset)
-        print("calculated offset: \(String(describing:offset))")
     }
     
     func setMapRegion() {
@@ -152,11 +160,8 @@ class ViewController: UIViewController,
         return merged
     }
     
-    func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
-        return nil
-    }
+    
 }
-
 
 // Attribution: https://stackoverflow.com/a/55356729
 extension String {

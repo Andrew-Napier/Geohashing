@@ -32,7 +32,6 @@ class StockMarketDataFetcher : NSObject {
         let dataTask = session.dataTask(with: request as URLRequest, completionHandler: { (data, response, error) -> Void in
             if (error != nil) {
                 print(error ?? "No Error?")
-                self.stockIndicator = "12345.67"
             } else {
                 let httpResponse = response as? HTTPURLResponse
                 if httpResponse?.statusCode == 200 {
