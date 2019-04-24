@@ -33,19 +33,6 @@ class ViewController: UIViewController,
         locationFetcher?.doLocationStuff()
     }
     
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-//        mapView.register(MKMarkerAnnotationView.self,
-//                         forAnnotationViewWithReuseIdentifier: "pin")
-//        let hashLocation = CLLocationCoordinate2D(latitude: Double(lon), longitude: Double(lat))
-//        let hashLocation = self.merge(currentLocation: corner, withOffset: self.offset)
-//        let pos = GeohashMarker("geohash", location: hashLocation)
-//
-//        self.mapView.addAnnotation(pos )
-
-    }
-
     func disableMyLocationBasedFeatures() {
         print("Disabled")
     }
@@ -112,22 +99,10 @@ class ViewController: UIViewController,
         var longitudeHexOffset = seed.md5
         longitudeHexOffset.removeFirst(16)
         
-        var latitudeOffset = 0.0
-        var longitudeDecOffset = 0.0
-        for i in 0..<16 {
-            let latChar = String(Array(latitudeHexOffset.unicodeScalars)[i])
-            let lonChar = String(Array(longitudeHexOffset.unicodeScalars)[i])
-            
-            let exp = -1.0 * (Double(exactly: i+1) ?? 0.0)
-            if let x = Int(latChar, radix:16) {
-                latitudeOffset += Double(x) * pow(16.0, exp)
-            }
-            if let y = Int(lonChar, radix:16) {
-                longitudeDecOffset += Double(y) * pow(16.0, exp)
-            }
-        }
-        self.offset = CLLocationCoordinate2D(latitude: latitudeOffset,
-                                             longitude: longitudeDecOffset)
+        let lat = latitudeHexOffset.asDecimalFraction(radix: 16)
+        let lon = longitudeHexOffset.asDecimalFraction(radix: 16)
+        self.offset = CLLocationCoordinate2D(latitude: lat,
+                                             longitude: lon)
     }
     
     func setMapRegion() {
@@ -163,8 +138,8 @@ class ViewController: UIViewController,
     
 }
 
-// Attribution: https://stackoverflow.com/a/55356729
 extension String {
+    // Attribution: https://stackoverflow.com/a/55356729
     var md5: String {
         let data = Data(self.utf8)
         let hash = data.withUnsafeBytes { (bytes: UnsafeRawBufferPointer) -> [UInt8] in
@@ -173,5 +148,21 @@ extension String {
             return hash
         }
         return hash.map { String(format: "%02x", $0) }.joined()
+    }
+    
+    func asDecimalFraction(radix r : Int) -> Double {
+        let rDouble = Double(r)
+        var offset = 0.0
+        let count = self.unicodeScalars.count
+        
+        for i in 0..<count {
+            let latChar = String(Array(self.unicodeScalars)[i])
+            
+            let exp = -1.0 * (Double(exactly: i+1) ?? 0.0)
+            if let x = Int(latChar, radix: r) {
+                offset += Double(x) * pow(rDouble, exp)
+            }
+        }
+        return offset
     }
 }
