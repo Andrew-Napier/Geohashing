@@ -34,7 +34,6 @@
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                     </view>
-                    <navigationItem key="navigationItem" title="XKCD Geohashing" id="PYY-e4-sc6"/>
                     <connections>
                         <outlet property="mapView" destination="ngR-f6-u9C" id="VU8-Rh-UkA"/>
                     </connections>
