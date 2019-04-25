@@ -31,6 +31,9 @@ class ViewController: UIViewController,
         locationFetcher = LocationFetcher(self)
         locationFetcher?.addObserver(self, forKeyPath: "current", context: nil)
         locationFetcher?.doLocationStuff()
+    self.navigationController?.navigationBar.setBackgroundImage(UIImage(), for: .default)
+        self.navigationController?.navigationBar.shadowImage = UIImage()
+        self.navigationController?.navigationBar.isTranslucent = true
     }
     
     func disableMyLocationBasedFeatures() {
@@ -74,8 +77,8 @@ class ViewController: UIViewController,
     
     func addLocationAnnotations() {
         DispatchQueue.main.async {
-            for lon in 148...156 { //-179...179 {
-                for lat in -30 ... -24 { //-89...89 {
+            for lon in  -179...179 {
+                for lat in -89...89 {
                     let corner = CLLocationCoordinate2D(latitude: Double(lat), longitude: Double(lon))
                     let hashLocation = self.merge(currentLocation: corner, withOffset: self.offset)
                     let pos = GeohashMarker(self.stockIndicator ?? "geohash",
