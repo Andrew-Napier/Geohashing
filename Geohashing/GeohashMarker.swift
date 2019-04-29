@@ -6,6 +6,7 @@
 //  Copyright © 2019 Andrew Napier. All rights reserved.
 //
 
+import Contacts
 import Foundation
 import MapKit
 
@@ -19,5 +20,13 @@ import MapKit
         self.coordinate = coord
     }
     
-    
+    public func mapItem() -> MKMapItem {
+        
+        let addressDict = [CNPostalAddressStreetKey: self.title!]
+        let placemark = MKPlacemark(coordinate: coordinate, addressDictionary: addressDict)
+        let mapItem = MKMapItem(placemark: placemark)
+        mapItem.name = title
+        return mapItem
+    }
+
 }
