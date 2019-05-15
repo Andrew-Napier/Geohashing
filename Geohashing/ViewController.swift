@@ -41,13 +41,13 @@ class ViewController: UIViewController,
     }
  
     func enableMyWhenInUseFeatures() {
-        let dateToHash = Date()
+        let dateToHash = Date().addingTimeInterval(TimeInterval(-86400))
         let components = Calendar.current.dateComponents([.day, .month, .year], from: dateToHash)
         
         let y = components.year ?? 0
         let m = components.month ?? 0
-        var d = components.day ?? 0
-        d -= 1
+        let d = components.day ?? 0
+
         dataFetcher = StockMarketDataFetcher(year: y, month: m, day: d)
         dataFetcher.addObserver(self, forKeyPath: "stockIndicator", context: nil)
         dataFetcher.doFetch()
