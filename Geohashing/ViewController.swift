@@ -31,7 +31,7 @@ class ViewController: UIViewController,
         locationFetcher = LocationFetcher(self)
         locationFetcher?.addObserver(self, forKeyPath: "current", context: nil)
         locationFetcher?.doLocationStuff()
-    self.navigationController?.navigationBar.setBackgroundImage(UIImage(), for: .default)
+        self.navigationController?.navigationBar.setBackgroundImage(UIImage(), for: .default)
         self.navigationController?.navigationBar.shadowImage = UIImage()
         self.navigationController?.navigationBar.isTranslucent = true
     }
@@ -41,13 +41,13 @@ class ViewController: UIViewController,
     }
  
     func enableMyWhenInUseFeatures() {
-        let dateToHash = Date()
+        let dateToHash = Date().addingTimeInterval(TimeInterval(-86400))
         let components = Calendar.current.dateComponents([.day, .month, .year], from: dateToHash)
         
         let y = components.year ?? 0
         let m = components.month ?? 0
-        var d = components.day ?? 0
-        d -= 1
+        let d = components.day ?? 0
+
         dataFetcher = StockMarketDataFetcher(year: y, month: m, day: d)
         dataFetcher.addObserver(self, forKeyPath: "stockIndicator", context: nil)
         dataFetcher.doFetch()
@@ -81,7 +81,14 @@ class ViewController: UIViewController,
                 for lat in -89...89 {
                     let corner = CLLocationCoordinate2D(latitude: Double(lat), longitude: Double(lon))
                     let hashLocation = self.merge(currentLocation: corner, withOffset: self.offset)
-                    let pos = GeohashMarker(self.stockIndicator ?? "geohash",
+                    var title : String
+                    if self.stockIndicator != nil {
+                        title = "[\(lat),\(lon)]\n\(self.datePrefix)-\(self.stockIndicator!)"
+                    } else {
+                        title = "[\(lat),\(lon)]\nGeohash"
+                    }
+                    
+                    let pos = GeohashMarker(title,
                                             location: hashLocation)
                     
                     self.mapView.addAnnotation(pos )
@@ -138,8 +145,36 @@ class ViewController: UIViewController,
         return merged
     }
     
+    func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
+        guard let annotation = annotation as? GeohashMarker else {
+            return nil
+        }
+        var view : MKMarkerAnnotationView
+        if let dequeuedView = mapView.dequeueReusableAnnotationView(withIdentifier: "marker")
+            as? MKMarkerAnnotationView {
+            dequeuedView.annotation = annotation
+            view = dequeuedView
+        } else  {
+            view = MKMarkerAnnotationView(annotation: annotation, reuseIdentifier: "marker")
+            view.canShowCallout = true
+            view.calloutOffset = CGPoint(x: -5, y: -5)
+            view.rightCalloutAccessoryView = UIButton(type:.detailDisclosure)
+        }
+        
+        return view
+    }
     
+    func mapView(_ mapView: MKMapView, annotationView view: MKAnnotationView, calloutAccessoryControlTapped control: UIControl) {
+        guard let location = view.annotation as? GeohashMarker else {
+            return
+        }
+        let launchOptions = [MKLaunchOptionsDirectionsModeKey: MKLaunchOptionsDirectionsModeDriving]
+        location.mapItem().openInMaps(launchOptions: launchOptions)
+    }
+
 }
+
+
 
 extension String {
     // Attribution: https://stackoverflow.com/a/55356729
